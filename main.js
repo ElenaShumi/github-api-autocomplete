@@ -30,22 +30,26 @@ class View {
 
     createRepositories(repositoryData) {
         const repElement = this.createElement('li', 'repository-item')
-        repElement.addEventListener('click', () => this.addListRepositories(repositoryData))
+        repElement.addEventListener('click', () => {
+            this.addListRepositories(repositoryData);
+            this.searchInput.value = '';
+            this.repositoriesList.innerHTML = '';
+        })
 
         repElement.insertAdjacentHTML('beforeend', `<div class="repository-item__name">${repositoryData.name}</div>`)
         this.repositoriesList.append(repElement);
     }
 
     addListRepositories(repositoryData) {
-        console.log(repositoryData)
         const repository = this.createElement('li', 'main-item');
 
         repository.insertAdjacentHTML('beforeend', `<div class="main-item__name">Name: ${repositoryData.name}</div>
                                                     <div class="main-item__owner">Owner: ${repositoryData.owner.login}</div>
                                                     <div class="main-item__stars">Stars: ${repositoryData.stargazers_count}</div>`);
         
-        const btnClose = this.createElement('button', 'btn-close')
-        repository.append(btnClose)
+        
+        const btnClose = this.createElement('button', 'btn-close');
+        repository.append(btnClose);
 
         btnClose.addEventListener('click', () => repository.remove())
         this.mainList.append(repository);
@@ -60,7 +64,7 @@ class Search {
     }
 
     async searchRepositories() {
-        const searchValue = this.view.searchInput.value;
+        const searchValue = this.view.searchInput.value.replace(/\s/g, '');
         if (searchValue) {
             this.clearRepositories();
             return await fetch(`https://api.github.com/search/repositories?q=${this.view.searchInput.value}&per_page=5`).then((res) => {
